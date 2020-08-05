@@ -1,0 +1,28 @@
+version: "3.8"
+networks:
+  app-tier:
+    driver: bridge
+services:
+  db:
+    container_name: ${NAMESPACE}_db
+    image: 'mysql'
+    environment:
+      MYSQL_ROOT_PASSWORD: 'password'
+    networks:
+      - app-tier
+  web:
+    tty: true
+    stdin_open: true
+    container_name: ${NAMESPACE}_web
+    image: 'php:7.3.8'
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/usr/src/${NAMESPACE}
+    working_dir: /usr/src/${NAMESPACE}
+    command: "php -S 0.0.0.0:3000"
+    ports:
+      - 3000:3000
+    networks:
+      - app-tier
